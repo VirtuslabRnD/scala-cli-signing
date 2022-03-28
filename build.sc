@@ -1,7 +1,7 @@
 import $ivy.`io.github.alexarchambault.mill::mill-native-image::0.1.20-2`
 import $ivy.`io.github.alexarchambault.mill::mill-native-image-upload:0.1.20-2`
 
-import $file.publish, publish.finalPublishVersion
+import $file.publish, publish.{finalPublishVersion, publishSonatype => publishSonatype0}
 
 import io.github.alexarchambault.millnativeimage.NativeImage
 import io.github.alexarchambault.millnativeimage.upload.Upload
@@ -40,7 +40,7 @@ trait ScalaCliSigningPublish extends PublishModule {
   import mill.scalalib.publish._
   def pomSettings = PomSettings(
     description = artifactName(),
-    organization = "org.virtuslab.scala-cli",
+    organization = "org.virtuslab.scala-cli.signing",
     url = s"https://github.com/$ghOrg/$ghName",
     licenses = Seq(License.`Apache-2.0`),
     versionControl = VersionControl.github(ghOrg, ghName),
@@ -259,5 +259,12 @@ object ci extends Module {
       dryRun = false,
       overwrite = overwriteAssets
     )(launchers: _*)
+  }
+
+  def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) = T.command {
+    publishSonatype0(
+      data = define.Target.sequence(tasks.value)(),
+      log = T.ctx().log
+    )
   }
 }
